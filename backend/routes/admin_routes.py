@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from models import User, ParkingSpot, db
+from models import User, ParkingSpot, db, ParkingLot
 from flask_jwt_extended import get_jwt_identity
 
 
@@ -32,27 +32,52 @@ def get_all_users():
     return jsonify(user_list), 200
 
 
-# Parking Spots
-@admin_bp.route('/spots', methods=['GET'])
-def get_spots():
-    spots = ParkingSpot.query.all()
-    return jsonify([
-        {
-            "id": spot.id,
-            "lot_id": spot.lot_id,
-            "spot_number": spot.spot_number,
-            "status": spot.status
-        } for spot in spots
-    ]), 200
-
-@admin_bp.route('/spots', methods=['POST'])
-def add_spot():
+# Parking Lots
+@admin_bp.route('/parking_lots', methods=['POST'])
+def create_parking_lot():
     data = request.get_json()
-    spot = ParkingSpot(
-        lot_id=data['lot_id'],
-        spot_number=data['spot_number'],
-        status=data['status']
+    
+    # Create a new parking lot
+    new_ParkingLot = ParkingLot(
+        prime_location_name=data['name'],
+        price=data['price'],
+        address=data['address'],
+        pin_code=data['pin_code'],
+        number_of_spots=data['number_of_spots']
     )
-    db.session.add(spot)
+    db.session.add(new_ParkingLot)
     db.session.commit()
-    return jsonify({"msg": "Spot created"}), 201
+
+    # Auto-generate parking spots
+    for i in range(1, new_ParkingLot.number_of_spots + 1):
+        spot = ParkingSpot(
+            lot_id=new_ParkingLot.id,
+            spot_number=f"Spot {i}",
+            status='A'
+        )
+        db.session.add(spot)
+
+    db.session.commit()
+
+    return jsonify({"msg": "Parking lot created successfully!", 'lot_id': new_ParkingLot.id,
+                     "created_at": new_ParkingLot.created_at.isoformat()}), 201
+
+
+# Parking Spots
+@admin_bp.route('/parking_spots', methods=['POST'])
+def create_parking_spots():
+    data = request.get_json()
+    new_spots = []
+
+    for i in range(1, data['number_of_spots'] + 1):
+        spot = ParkingSpot(
+            lot_id=data['lot_id'],
+            spot_number=f"Spot {i}",
+            status='A'
+        )
+        db.session.add(spot)
+        new_spots.append(spot)
+
+    db.session.commit()
+
+    return jsonify({"msg": "Parking spots created successfully!", "spots": [spot.id for spot in new_spots]}), 201

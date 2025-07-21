@@ -18,19 +18,23 @@ function logout() {
         <div class="list-group shadow">
 
           <router-link to="/admin/users" class="list-group-item list-group-item-action">
-            👥 View All Users
+            View All Users
           </router-link>
 
-          <router-link to="/admin/spots" class="list-group-item list-group-item-action">
-            🅿️ Manage Parking Spots
+          <router-link to="/admin/parking_lots" class="list-group-item list-group-item-action">
+            Manage Parking Lots
+          </router-link>
+
+          <router-link to="/admin/parking_spots" class="list-group-item list-group-item-action">
+            Manage Parking Spots
           </router-link>
 
           <router-link to="/admin/reservations" class="list-group-item list-group-item-action">
-            📅 View Reservations
+            View Reservations
           </router-link>
 
           <button class="list-group-item list-group-item-action text-danger" @click="logout">
-            🚪 Logout
+            Logout
           </button>
 
         </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="container py-5">
     <div class="text-center mb-4">
-      <h1 class="display-5 fw-bold">🚗 Vehicle Parking App</h1>
+      <h1 class="display-5 fw-bold">Vehicle Parking App</h1>
       <p class="lead">
         Book your 4-wheeler parking spot in just a few clicks.
       </p>

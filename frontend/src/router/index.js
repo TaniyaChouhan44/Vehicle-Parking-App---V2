@@ -8,6 +8,7 @@ import UserHome from '../pages/user/UserHome.vue'
 import AllUsers from '../pages/admin/AllUsers.vue'
 import ParkingSpots from '../pages/admin/ParkingSpots.vue'
 import AvailableParkingLots from '../pages/user/AvailableParkingLots.vue'
+import AdminCreateLot from '../pages/admin/AdminCreateLot.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -18,7 +19,8 @@ const routes = [
   { path: '/user/home', component: UserHome },
   { path: '/admin/users', component: AllUsers },
   { path: '/admin/slots', component: ParkingSpots },
-  { path: '/user/available-lots', component: AvailableParkingLots }
+  { path: '/user/available-lots', component: AvailableParkingLots },
+  { path: '/admin/parking_lots', component: AdminCreateLot }
 
 ]
 
