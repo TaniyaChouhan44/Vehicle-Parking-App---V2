@@ -64,20 +64,47 @@ def create_parking_lot():
 
 
 # Parking Spots
-@admin_bp.route('/parking_spots', methods=['POST'])
-def create_parking_spots():
-    data = request.get_json()
-    new_spots = []
+@admin_bp.route('/parking_spots', methods=['GET'])
+@jwt_required()
+def get_all_parking_spots():
+    try:
+        spots = ParkingSpot.query.all()
+        data = [{
+            'id': spot.id,
+            'lot_id': spot.lot_id,
+            'status': spot.status,
+            'spot_number': spot.spot_number
+        } for spot in spots]
+        return jsonify(data), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'Error fetching parking spots'}), 500
 
-    for i in range(1, data['number_of_spots'] + 1):
-        spot = ParkingSpot(
-            lot_id=data['lot_id'],
-            spot_number=f"Spot {i}",
-            status='A'
-        )
-        db.session.add(spot)
-        new_spots.append(spot)
 
+# Get all parking spots for a lot
+@admin_bp.route('/parking_spots/<int:lot_id>', methods=['GET'])
+def get_parking_spots(lot_id):
+    spots = ParkingSpot.query.filter_by(lot_id=lot_id).all()
+    spots_data = [
+        {
+            'id': spot.id,
+            'lot_id': spot.lot_id,
+            'spot_number': spot.spot_number,
+            'status': spot.status
+        }
+        for spot in spots
+    ]
+    return jsonify(spots_data), 200
+
+# Delete a parking spot
+@admin_bp.route('/parking_spots/<int:spot_id>', methods=['DELETE'])
+def delete_parking_spot(spot_id):
+    spot = ParkingSpot.query.get(spot_id)
+
+    if not spot:
+        return jsonify({'message': 'Parking spot not found'}), 404
+
+    db.session.delete(spot)
     db.session.commit()
 
-    return jsonify({"msg": "Parking spots created successfully!", "spots": [spot.id for spot in new_spots]}), 201
+    return jsonify({'message': 'Parking spot deleted successfully'}), 200

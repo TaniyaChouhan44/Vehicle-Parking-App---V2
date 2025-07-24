@@ -1,138 +1,101 @@
 <template>
-  <div class="p-4">
-    <h2 class="text-xl font-bold mb-4">Create Parking Lot</h2>
+  <div class="p-4 max-w-xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4 text-center">Create Parking Lot</h2>
 
-    <!-- Create Form -->
-    <form @submit.prevent="create_parking_lot" class="mb-6">
-      <div class="mb-3">
-        <label>Name:</label>
-        <input v-model="new_ParkingLot.name" required class="border p-1 w-full" />
+    <form @submit.prevent="create_parking_lot" class="space-y-4">
+      <div>
+        <label class="block mb-1 font-semibold">Name:</label>
+        <input v-model="new_ParkingLot.name" required class="border p-2 w-full rounded" />
       </div>
-      <div class="mb-3">
-        <label>Price:</label>
-        <input v-model.number="new_ParkingLot.price" type="number" required class="border p-1 w-full" />
+
+      <div>
+        <label class="block mb-1 font-semibold">Price (per hour):</label>
+        <input v-model.number="new_ParkingLot.price" type="number" required class="border p-2 w-full rounded" />
       </div>
-      <div class="mb-3">
-        <label>Address:</label>
-        <input v-model="new_ParkingLot.address" required class="border p-1 w-full" />
+
+      <div>
+        <label class="block mb-1 font-semibold">Address:</label>
+        <input v-model="new_ParkingLot.address" required class="border p-2 w-full rounded" />
       </div>
-      <div class="mb-3">
-        <label>Pincode:</label>
-        <input v-model="new_ParkingLot.pin_code" required class="border p-1 w-full" />
+
+      <div>
+        <label class="block mb-1 font-semibold">Pincode:</label>
+        <input v-model="new_ParkingLot.pin_code" required class="border p-2 w-full rounded" />
       </div>
-      <div class="mb-3">
-        <label>Number of Spots:</label>
-        <input v-model.number="new_ParkingLot.number_of_spots" type="number" required class="border p-1 w-full" />
+
+      <div>
+        <label class="block mb-1 font-semibold">Number of Spots:</label>
+        <input v-model.number="new_ParkingLot.number_of_spots" type="number" required class="border p-2 w-full rounded" />
       </div>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded" type="submit">Create Lot</button>
+
+      <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" type="submit">Create Lot</button>
+
+      <div v-if="error" class="text-red-600 mt-2 text-center">{{ error }}</div>
     </form>
-
-    <!-- Parking Lots List -->
-    <div v-if="parkingLots.length">
-      <h2 class="text-xl font-bold mb-4">Existing Parking Lots</h2>
-      <table class="table-auto w-full border">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="border px-4 py-2">ID</th>
-            <th class="border px-4 py-2">Name</th>
-            <th class="border px-4 py-2">Price</th>
-            <th class="border px-4 py-2">Address</th>
-            <th class="border px-4 py-2">Pincode</th>
-            <th class="border px-4 py-2">Spots</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="lot in parkingLots" :key="lot.id">
-            <td class="border px-4 py-2">{{ lot.id }}</td>
-            <td class="border px-4 py-2">{{ lot.name }}</td>
-            <td class="border px-4 py-2">{{ lot.price }}</td>
-            <td class="border px-4 py-2">{{ lot.address }}</td>
-            <td class="border px-4 py-2">{{ lot.pin_code }}</td>
-            <td class="border px-4 py-2">{{ lot.number_of_spots }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div v-else class="text-gray-500 mt-4">No parking lots found.</div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-
 export default {
   name: 'AdminCreateLot',
-  setup() {
-    const new_ParkingLot = ref({
-      name: '',
-      price: '',
-      address: '',
-      pin_code: '',
-      number_of_spots: 0
-    });
-
-    const parkingLots = ref([]);
-
-    // Load all lots from backend
-    const loadLots = async () => {
-      try {
-        const res = await fetch(import.meta.env.VITE_BASEURL + '/admin/parking_lots');
-        const data = await res.json();
-        if (res.ok) {
-          parkingLots.value = data;
-        } else {
-          console.error('Failed to load lots:', data.msg);
-        }
-      } catch (err) {
-        console.error('Error loading lots:', err);
-      }
+  data() {
+    return {
+      new_ParkingLot: {
+        name: '',
+        price: null,
+        address: '',
+        pin_code: '',
+        number_of_spots: null
+      },
+      error: ''
     };
-
-    // Create new lot
-    const create_parking_lot = async () => {
+  },
+  methods: {
+    async create_parking_lot() {
       try {
-        const res = await fetch(import.meta.env.VITE_BASEURL + '/admin/parking_lots', {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          this.error = 'Unauthorized: No token found.';
+          return;
+        }
+
+        const response = await fetch(import.meta.env.VITE_BASEURL + '/admin/parking_lots', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
           },
-          body: JSON.stringify(new_ParkingLot.value),
+          body: JSON.stringify(this.new_ParkingLot),
         });
 
-        const data = await res.json();
+        const result = await response.json();
 
-        if (res.ok) {
-          alert('Lot created successfully');
-          new_ParkingLot.value = {
-            name: '',
-            price: '',
-            address: '',
-            pin_code: '',
-            number_of_spots: 0
-          };
-          await loadLots(); // Refresh list
-        } else {
-          alert(data.msg || 'Failed to create lot');
+        if (!response.ok) {
+          this.error = result.msg || 'Failed to create lot.';
+          return;
         }
+
+        alert('Parking lot created successfully!');
+        this.error = '';
+        // Optional: Reset form
+        this.new_ParkingLot = {
+          name: '',
+          price: null,
+          address: '',
+          pin_code: '',
+          number_of_spots: null
+        };
       } catch (error) {
         console.error('Error creating lot:', error);
+        this.error = 'Server error. Please try again later.';
       }
-    };
-
-    onMounted(loadLots);
-
-    return {
-      new_ParkingLot,
-      create_parking_lot,
-      parkingLots
-    };
+    }
   }
 }
 </script>
 
 <style scoped>
 input {
-  border-radius: 0.25rem;
+  outline: none;
 }
 </style>

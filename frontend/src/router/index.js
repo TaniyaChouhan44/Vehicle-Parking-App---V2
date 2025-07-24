@@ -18,7 +18,7 @@ const routes = [
   { path: '/admin/home', component: AdminHome },
   { path: '/user/home', component: UserHome },
   { path: '/admin/users', component: AllUsers },
-  { path: '/admin/slots', component: ParkingSpots },
+  { path: '/admin/parking_spots', component: ParkingSpots },
   { path: '/user/available-lots', component: AvailableParkingLots },
   { path: '/admin/parking_lots', component: AdminCreateLot }
 
