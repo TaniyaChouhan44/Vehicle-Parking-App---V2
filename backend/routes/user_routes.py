@@ -3,8 +3,12 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models import ParkingLot, Reservation, ParkingSpot, User 
 import datetime
 from datetime import datetime
-from flask import Response
+from flask import Response, request
 from extensions import db, cache
+import csv
+import io
+
+
 
 
 
@@ -77,7 +81,7 @@ def book_spot(lot_id):
 @jwt_required()
 def user_reservations():
     try:
-        user_id = get_jwt_identity()  # Get user ID from token
+        user_id = get_jwt_identity()  
 
         reservations = Reservation.query.filter_by(user_id=user_id).all()
         data = []
@@ -145,29 +149,14 @@ def release_reservation(reservation_id):
         traceback.print_exc()
         return jsonify({'msg': f'Server error: {str(e)}'}), 500
     
-
-from models import User  
+    
+    
 @user_bp.route('/export-csv', methods=['POST'])
 @jwt_required()
 def export_csv():
-    try:
-        user_id = get_jwt_identity()  
-        user = User.query.get(int(user_id))
-
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-
-        user_email = user.email
-        print(f"[INFO] CSV export requested by user: {user_email}")
-        
-        from tasks.csv_tasks import export_reservations_to_csv
-        export_reservations_to_csv.delay(user_email)
-
-        return jsonify({'message': 'CSV export task has been scheduled. Please check your email.'}), 202
-
-    except Exception as e:
-        print("[ERROR] CSV Export Error:", str(e))
-        return jsonify({'error': 'Failed to schedule CSV export task'}), 500
+    from tasks.csv_tasks import export_csv_task
+    export_csv_task.delay()
+    return jsonify({"message": "CSV export initiated."}), 200
 
 
 @user_bp.route('/monthly-report', methods=['GET'])

@@ -5,6 +5,7 @@ from flask_jwt_extended import get_jwt_identity
 from extensions import db
 
 
+
 admin_bp = Blueprint('admin', __name__)
 
 
@@ -192,3 +193,4 @@ def get_analytics():
     except Exception as e:
         print("Analytics fetch error:", e)
         return jsonify({'msg': 'Analytics loading failed'}), 500
+

@@ -26,17 +26,17 @@
       <!-- Report buttons -->
       <div class="mt-4">
         <button class="btn btn-primary me-2" @click="downloadMonthlyReport">
-          📥 Download Monthly Report (HTML)
+          Download Monthly Report (HTML)
         </button>
         <button class="btn btn-success" @click="exportCSV">
-          📤 Export CSV via Email
+          Export CSV via Email
         </button>
       </div>
 
       <!-- Logout -->
       <div class="mt-4">
         <button class="btn btn-danger" @click="logout">
-          🔒 Logout
+          Logout
         </button>
       </div>
     </div>
@@ -73,25 +73,30 @@ export default {
         });
     },
     exportCSV() {
-      fetch(import.meta.env.VITE_BASEURL+'/user/export-csv', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", // optional, helps for clarity
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok) {
-            throw new Error(data.error || "Server error");
-          }
-          alert(data.message || "CSV export request sent!");
-        })
-        .catch((err) => {
-          console.error("CSV export failed:", err);
-          alert("Failed to send CSV export request.");
-        });
+  const token = localStorage.getItem("token");
+
+  fetch(import.meta.env.VITE_BASEURL + "/user/export-csv", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify({}), 
+  })
+    .then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Server error");
+      }
+      alert(data.message || "CSV export request sent!");
+    })
+    .catch((err) => {
+      console.error("CSV export failed:", err);
+      alert("Failed to send CSV export request.");
+    });
+},
+
+
 
     logout() {
       localStorage.removeItem("token");

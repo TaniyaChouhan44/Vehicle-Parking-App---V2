@@ -7,13 +7,14 @@ class Config:
     CELERY_BROKER_URL = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
-    MAIL_DEFAULT_SENDER = 'tanu99999454@gmail.com'
-    MAIL_PORT = 465
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
-    MAIL_USERNAME = "tanu99999454@gmail.com"
-    MAIL_PASSWORD = 'qtge ooqe weax vkrn'  
     MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_DEFAULT_SENDER = 'tanu99999454@gmail.com'
+    MAIL_USERNAME = "tanu99999454@gmail.com"
+    MAIL_PASSWORD = 'ikmt hhuw jzhx kjms'  
+    MAIL_DEFAULT_SENDER = 'tanu99999454@gmail.com'
+   
 
     CACHE_TYPE = "RedisCache"
     CACHE_REDIS_HOST = "localhost"
@@ -21,4 +22,8 @@ class Config:
     CACHE_REDIS_DB = 0
     CACHE_DEFAULT_TIMEOUT = 300
 
-    SERVER_NAME = '127.0.0.1:5000'
+
+
+  
+   
+   
